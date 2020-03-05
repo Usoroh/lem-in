@@ -14,6 +14,15 @@ type Room struct {
 	Nxt   *Room
 }
 
+func inSlice(slice []*Room, val *Room) bool {
+    for i := 0; i < len(slice); i++ {
+        if slice[i] == val {
+            return true
+        }
+    }
+    return false
+}
+
 func createRooms(f *os.File) []Room {
 	var str string
 	var rooms []Room
@@ -51,7 +60,7 @@ func createRooms(f *os.File) []Room {
 	return rooms
 }
 
-func getLinks(filename string) {
+func getLinks(filename string) [][]string {
 	f, _ := os.Open(filename)
 	var str string
 	var parameters []string
@@ -74,16 +83,28 @@ func getLinks(filename string) {
 		}
 	}
 	fmt.Println(links)
+	return links
 }
 
-func linkRooms(r []Room, l [][]string) {
-	for i := 0; i < len(l); i++ {
-		for j := 0; j < len(r); j++ {
-			if l[i][0] == r[j].Name {
+func getAdresses(rooms []Room, links [][]string) []*Room { 
+	var adresses []*Room
+	for i := 0; i < len(links); i++ {
+		for j := 0; j < len(rooms); j++ {
+			if links[i][0] == rooms[j].Name {
+				adresses = append(adresses, &rooms[j])
+			}
+			if links[i][1] == rooms[j].Name  {
+				adresses = append(adresses, &rooms[j])
 			}
 		}
 	}
+
+	for i := 0; i < len(adresses)-1; i++{
+		adresses[i].Nxt = adresses[i+1]
+	}
+	return adresses
 }
+
 
 func main() {
 	args := os.Args[1:]
@@ -91,6 +112,10 @@ func main() {
 		file, _ := os.Open(args[0])
 		rooms := createRooms(file)
 		fmt.Println(rooms)
-		getLinks(args[0])
+		l := getLinks(args[0])
+		a := getAdresses(rooms, l)
+		fmt.Println(a)
+		fmt.Println(rooms)
+		r := rooms[0]
 	}
 }
