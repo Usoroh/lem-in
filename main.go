@@ -11,8 +11,11 @@ type Room struct {
 	Ants  int
 	Name  string
 	Coord []string
-	Nxt   *Room
+	Nxt   []*Room
 }
+
+var start *Room
+var end *Room
 
 func inSlice(slice []*Room, val *Room) bool {
     for i := 0; i < len(slice); i++ {
@@ -30,7 +33,6 @@ func createRooms(f *os.File) []Room {
 	var parameters []string
 	flag := false
 	i := 0
-
 	sc := bufio.NewScanner(f)
 	for sc.Scan() {
 		if i == 1 {
@@ -39,6 +41,7 @@ func createRooms(f *os.File) []Room {
 			room.Name = parameters[0]
 			room.Coord = parameters[1:]
 			rooms = append(rooms, room)
+
 			i = 0
 		}
 		if strings.TrimSpace(sc.Text()) == "##end" {
@@ -82,27 +85,38 @@ func getLinks(filename string) [][]string {
 			skip++
 		}
 	}
-	fmt.Println(links)
 	return links
 }
 
-func getAdresses(rooms []Room, links [][]string) []*Room { 
-	var adresses []*Room
+func linkRooms(rooms []Room, links [][]string) {
+	var linkFrom *Room
+	var linkTo *Room
 	for i := 0; i < len(links); i++ {
-		for j := 0; j < len(rooms); j++ {
-			if links[i][0] == rooms[j].Name {
-				adresses = append(adresses, &rooms[j])
-			}
-			if links[i][1] == rooms[j].Name  {
-				adresses = append(adresses, &rooms[j])
+		for j := 0; j < len(links[i]); j++ {
+			for k := 0; k < len(rooms); k++ {
+				if rooms[k].Name == links[i][0] {
+					linkFrom = &rooms[k]
+				}
+				if rooms[k].Name == links[i][1] {
+					linkTo = &rooms[k]
+				}
 			}
 		}
+		linkFrom.Nxt = append(linkFrom.Nxt, linkTo)
+		fmt.Println("Link from: ", linkFrom.Name)
+		fmt.Println("Link to: ", linkTo.Name)
 	}
+}
 
-	for i := 0; i < len(adresses)-1; i++{
-		adresses[i].Nxt = adresses[i+1]
+func findPaths(rooms []Room) {
+	start := rooms[0]
+	var end := rooms[len(rooms)-1]
+	queue := []*Room
+
+	queue = append(queue, start)
+	for len(queue) > 0 {
+
 	}
-	return adresses
 }
 
 
@@ -111,11 +125,12 @@ func main() {
 	if len(args) > 0 {
 		file, _ := os.Open(args[0])
 		rooms := createRooms(file)
-		fmt.Println(rooms)
+		fmt.Println("Rooms: ", rooms)
 		l := getLinks(args[0])
-		a := getAdresses(rooms, l)
-		fmt.Println(a)
-		fmt.Println(rooms)
-		r := rooms[0]
+		fmt.Println("Links: ", l)
+		linkRooms(rooms, l)
+		fmt.Println("Rooms: ", rooms)
+		fmt.Println("start: ", rooms[0])
+		fmt.Println("end: ", rooms[len(rooms)-1])
 	}
 }
