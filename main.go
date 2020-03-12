@@ -12,7 +12,6 @@ type Room struct {
 	Name  string
 	Coord []string
 	Nxt   []*Room
-	Visited bool
 }
 
 var start *Room
@@ -109,28 +108,38 @@ func linkRooms(rooms []Room, links [][]string) {
 	}
 }
 
+func isVisited(rooms []string, name string) bool {
+	for i := 0; i < len(rooms); i++ {
+		if name == rooms[i] {
+			return true
+		}
+	}
+	return false
+}
+
 func bfs(rooms []Room) {
 	var q []Room
+	var visited []string
 	start := rooms[0]
 	// end := rooms[len(rooms)-1]
 	crt := &start
-	crt.Visited = true
 	q = append(q, *crt)
+	visited = append(visited, crt.Name)
 	fmt.Println(crt.Name)
-	fmt.Println(crt.Visited)
+
 
 	//visit parent and its children
 	for len(q) > 0 {
-			fmt.Println("check", crt.Visited)
-			q = q[:len(q)-1]
-			for i := 0; i < len(crt.Nxt); i++ {
-				if !crt.Nxt[i].Visited {
-					q = append(q, *crt.Nxt[i])
-					fmt.Println("This is", crt.Nxt[i].Name, crt.Nxt[i].Visited)
-					crt.Nxt[i].Visited = true
-				}
+		q = q[:len(q)-1]
+		for i := 0; i < len(crt.Nxt); i++ {
+			if !isVisited(visited, crt.Nxt[i].Name) {
+				q = append(q, *crt.Nxt[i])
+				fmt.Println("q", q)
+				fmt.Println(crt.Nxt[i].Name)
+				visited = append(visited, crt.Nxt[i].Name)
 			}
-			crt = &q[0]
+		}
+		crt = &q[len(q)-1]
 	}
 }
 
