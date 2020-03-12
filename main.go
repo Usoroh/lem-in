@@ -12,6 +12,7 @@ type Room struct {
 	Name  string
 	Coord []string
 	Nxt   []*Room
+	Visited bool
 }
 
 var start *Room
@@ -108,14 +109,28 @@ func linkRooms(rooms []Room, links [][]string) {
 	}
 }
 
-func findPaths(rooms []Room) {
+func bfs(rooms []Room) {
+	var q []Room
 	start := rooms[0]
-	var end := rooms[len(rooms)-1]
-	queue := []*Room
+	// end := rooms[len(rooms)-1]
+	crt := &start
+	crt.Visited = true
+	q = append(q, *crt)
+	fmt.Println(crt.Name)
+	fmt.Println(crt.Visited)
 
-	queue = append(queue, start)
-	for len(queue) > 0 {
-
+	//visit parent and its children
+	for len(q) > 0 {
+			fmt.Println("check", crt.Visited)
+			q = q[:len(q)-1]
+			for i := 0; i < len(crt.Nxt); i++ {
+				if !crt.Nxt[i].Visited {
+					q = append(q, *crt.Nxt[i])
+					fmt.Println("This is", crt.Nxt[i].Name, crt.Nxt[i].Visited)
+					crt.Nxt[i].Visited = true
+				}
+			}
+			crt = &q[0]
 	}
 }
 
@@ -132,5 +147,6 @@ func main() {
 		fmt.Println("Rooms: ", rooms)
 		fmt.Println("start: ", rooms[0])
 		fmt.Println("end: ", rooms[len(rooms)-1])
+		bfs(rooms)
 	}
 }
