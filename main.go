@@ -117,27 +117,47 @@ func isVisited(rooms []string, name string) bool {
 	return false
 }
 
+func isParent(r Room, c Room) bool {
+	for i := 0; i < len(r.Nxt); i++ {
+		fmt.Println("checking", *r.Nxt[i])
+		if r.Nxt[i].Name == c.Name {
+			return true
+		}
+	}
+	return false
+}
+
+func clearPath(p []Room) []Room {
+	var finalPath []Room
+	for i := len(p)-1; i > 0; i-- {
+		if isParent(p[i-1], p[i]) {
+			finalPath = append(finalPath, p[i])
+		}
+	}
+	return finalPath
+}
+
 func bfs(rooms []Room) {
 	var q []Room
 	var visited []string
 	end := rooms[len(rooms)-1]
 	q = append(q, rooms[0])
 	// visited = append(visited, crt.Name)
-	var paths [][]string
-	var path []string
+	var path []Room
 	//visit parent and its children
 	for len(q) > 0 {
 	
 		crt := q[0]
 		fmt.Println(crt.Name)
 		visited = append(visited, crt.Name)
-		path = append(path, crt.Name)
+		path = append(path, crt)
 		q = q[1:]
 		for i := 0; i < len(crt.Nxt); i++ {
 			if crt.Nxt[i].Name == end.Name {
-				path = append(path, end.Name)
-				paths = append(paths, path)
-				fmt.Println(paths)
+				path = append(path, end)
+				fmt.Println(path)
+				finPath := clearPath(path)
+				fmt.Println(finPath)
 				return
 			}
 			if !isVisited(visited, crt.Nxt[i].Name) {
@@ -145,7 +165,7 @@ func bfs(rooms []Room) {
 			}
 		}
 	}
-	fmt.Println(paths)
+	
 }
 
 
