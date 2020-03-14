@@ -120,27 +120,32 @@ func isVisited(rooms []string, name string) bool {
 func bfs(rooms []Room) {
 	var q []Room
 	var visited []string
-	start := rooms[0]
-	// end := rooms[len(rooms)-1]
-	crt := &start
-	q = append(q, *crt)
-	visited = append(visited, crt.Name)
-	fmt.Println(crt.Name)
-
-
+	end := rooms[len(rooms)-1]
+	q = append(q, rooms[0])
+	// visited = append(visited, crt.Name)
+	var paths [][]string
+	var path []string
 	//visit parent and its children
 	for len(q) > 0 {
-		q = q[:len(q)-1]
+	
+		crt := q[0]
+		fmt.Println(crt.Name)
+		visited = append(visited, crt.Name)
+		path = append(path, crt.Name)
+		q = q[1:]
 		for i := 0; i < len(crt.Nxt); i++ {
+			if crt.Nxt[i].Name == end.Name {
+				path = append(path, end.Name)
+				paths = append(paths, path)
+				fmt.Println(paths)
+				return
+			}
 			if !isVisited(visited, crt.Nxt[i].Name) {
 				q = append(q, *crt.Nxt[i])
-				fmt.Println("q", q)
-				fmt.Println(crt.Nxt[i].Name)
-				visited = append(visited, crt.Nxt[i].Name)
 			}
 		}
-		crt = &q[len(q)-1]
 	}
+	fmt.Println(paths)
 }
 
 
